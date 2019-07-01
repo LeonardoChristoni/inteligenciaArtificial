@@ -9,7 +9,8 @@ public class AlgoritmoGenetico {
 	List<Mochila> bestMochilas = new ArrayList<Mochila>();
 	List<Mochila> mochilas = new ArrayList<Mochila>();
 	List<Item> itens = new ArrayList<>();
-	
+	Mochila[] teste = mochilas.stream().toArray(Mochila[]::new);
+	Item[] teste2 = itens.stream().toArray(Item[]::new);
 	
 	public AlgoritmoGenetico(List<Item> itens){
 		this.itens = itens;
@@ -23,9 +24,15 @@ public class AlgoritmoGenetico {
 				crossover();
 			}
 			mutacao();
-
+			System.out.println("===============================");
 			System.out.println("Geração "+i);
 			
+			if(bestMochilas.size()>0) {
+				System.out.print("Itens : [");
+				bestMochilas.get(0).getItens().forEach(x->System.out.print(x.getIdItem()+","));
+				System.out.println("]");
+				System.out.println("Num Itens: "+bestMochilas.get(0).getItens().size()+" Valor: "+bestMochilas.get(0).getValor()+" Peso: "+bestMochilas.get(0).getPeso());	
+			}
 		}
 	}
 	
@@ -46,24 +53,22 @@ public class AlgoritmoGenetico {
 		}
 		
 		for(int i=0;i<maiorSize;i++) {
+
+			boolean paiA = i<itensPaiA.size(), paiB= i<itensPaiB.size();
+			
 			if(i%2==0) {
-				if(i<itensPaiA.size()) {
-					mochilaA.getItens().add(itensPaiA.get(i));
-					mochilaB.getItens().add(itensPaiB.get(i));
-					
-					
-				}else{
-					mochilaA.getItens().add(itensPaiB.get(i));
-					mochilaB.getItens().add(itensPaiB.get(i));
-				}
+				mochilaA.getItens().add(paiA ? itensPaiA.get(i) : itensPaiB.get(i));
+				atualizaValores(mochilaA, paiA ? itensPaiA.get(i) : itensPaiB.get(i), 0);
+				
+				mochilaB.getItens().add(paiB ? itensPaiB.get(i) : itensPaiA.get(i));
+				atualizaValores(mochilaB, paiB ? itensPaiB.get(i) : itensPaiA.get(i), 0);
+			
 			}else {
-				if(i<itensPaiB.size()) {
-					mochilaB.getItens().add(itensPaiA.get(i));
-					mochilaA.getItens().add(itensPaiB.get(i));
-				}else {
-					mochilaB.getItens().add(itensPaiA.get(i));
-					mochilaA.getItens().add(itensPaiA.get(i));
-				}
+				mochilaA.getItens().add(paiB ? itensPaiB.get(i) : itensPaiA.get(i));
+				atualizaValores(mochilaA, paiB ? itensPaiB.get(i) : itensPaiA.get(i), 0);
+				
+				mochilaB.getItens().add(paiA ? itensPaiA.get(i) : itensPaiB.get(i));
+				atualizaValores(mochilaB, paiA ? itensPaiA.get(i) : itensPaiB.get(i), 0);
 			}
 		}
 		this.bestMochilas = new ArrayList<Mochila>();
@@ -73,17 +78,34 @@ public class AlgoritmoGenetico {
 	
 	private void mutacao() {
 		Random rand = new Random(System.currentTimeMillis());
-		int itemEscolhido;
+//		int itemEscolhido;
 		
-		//MUTACAO MOCHILA A
-		itemEscolhido = rand.nextInt(bestMochilas.get(0).getItens().size()-1);
-		bestMochilas.get(0).getItens().remove(itemEscolhido);
-		atualizaValores(bestMochilas.get(0), bestMochilas.get(0).getItens().get(itemEscolhido), 1);
+		if(bestMochilas.size()>0) {
+			//MUTACAO MOCHILA A
+//			itemEscolhido = rand.nextInt(itens.size()-1);
+			Item itemEscolhido = itens.get(rand.nextInt(itens.size()-1));
+			if(bestMochilas.get(0).getItens().contains(itemEscolhido)) {
+				atualizaValores(bestMochilas.get(0), itemEscolhido, 1);
+				bestMochilas.get(0).getItens().remove(itemEscolhido);
+			}else {
+				atualizaValores(bestMochilas.get(0), itemEscolhido, 0);
+				bestMochilas.get(0).getItens().add(itemEscolhido);
+			}
+			
+			//MUTACAO MOCHILA B
+//			itemEscolhido = rand.nextInt(bestMochilas.get(1).getItens().size()-1);
+			
+			if(bestMochilas.get(1).getItens().contains(itemEscolhido)) {
+				atualizaValores(bestMochilas.get(1), itemEscolhido, 1);
+				bestMochilas.get(1).getItens().remove(itemEscolhido);
+			}else {
+				atualizaValores(bestMochilas.get(1), itemEscolhido, 0);
+				bestMochilas.get(1).getItens().add(itemEscolhido);
+			}
+		}
 		
-		//MUTACAO MOCHILA B
-		itemEscolhido = rand.nextInt(bestMochilas.get(1).getItens().size()-1);
-		bestMochilas.get(1).getItens().remove(itemEscolhido);
-		atualizaValores(bestMochilas.get(1), bestMochilas.get(1).getItens().get(itemEscolhido), 1);
+		this.mochilas = new ArrayList<Mochila>(this.bestMochilas);
+		
 	}
 	
 	private boolean selecaoEletista() {
@@ -105,13 +127,13 @@ public class AlgoritmoGenetico {
 				i--;
 			}
 		}
+		teste = mochilas.stream().toArray(Mochila[]::new);
 	}
 	
 	private void iniciaPopulacao() {
 		Random rand = new Random(System.currentTimeMillis());
 		
-		int tamPopulacao = 2;
-		
+		int tamPopulacao = 5;
 		for(int i=0;i<tamPopulacao;i++) {
 			//gera cromossomo
 			Mochila mochila = new Mochila();
@@ -123,6 +145,7 @@ public class AlgoritmoGenetico {
 			}
 			this.mochilas.add(mochila);
 		}
+		teste = mochilas.stream().toArray(Mochila[]::new);
 	}
 	
 	private void atualizaValores(Mochila mochila,Item item,int verificador) {
