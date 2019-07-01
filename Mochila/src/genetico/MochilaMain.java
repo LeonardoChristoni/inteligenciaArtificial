@@ -36,6 +36,7 @@ public class MochilaMain {
 		
 		List<Item> itens = new ArrayList<>();
 		
+		/* INSTANCIA NOVA ITEM, COM PESO, VALOR E ID */
 		for(String linha : linhas) {
 			String lin[] = linha.split(",");
 			Item item = new Item(Double.parseDouble(lin[1]),Double.parseDouble(lin[2]), lin[0]);
