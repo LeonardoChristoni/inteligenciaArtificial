@@ -1,5 +1,6 @@
 package genetico;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +16,7 @@ public class MochilaMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Path caminho = Paths.get(System.getProperty("user.home"),"Downloads/teste.csv");
+		Path caminho = Paths.get(System.getProperty("user.home"),"Downloads/item_50.csv");
 		Supplier<Stream<String>> lines = () -> {
 			try {
 				return Files.lines(caminho);
@@ -39,11 +40,36 @@ public class MochilaMain {
 		/* INSTANCIA NOVA ITEM, COM PESO, VALOR E ID */
 		for(String linha : linhas) {
 			String lin[] = linha.split(",");
-			Item item = new Item(Double.parseDouble(lin[1]),Double.parseDouble(lin[2]), lin[0]);
+			Item item = new Item(Double.parseDouble(lin[1]),Double.parseDouble(lin[2]), lin[0],false);
 			itens.add(item);
 		}
 		
-		new AlgoritmoGenetico(itens);
+		AlgoritmoGenetico ag = new AlgoritmoGenetico(itens);
+		List<Item> solucao = ag.gerarSolucao();
+		
+		Path saida = Paths.get(System.getProperty("user.home"),"Downloads/saida.csv");
+		gerarSaidaCSV(saida,solucao);
+	}
+	
+	private static void gerarSaidaCSV(Path caminho,List<Item> solucao) {
+		try {
+			FileWriter writer = new FileWriter(caminho.toString());
+			for(Item sol : solucao) {
+				if(sol.isSelecionado()) {
+					writer.append("1");
+					writer.append("\n");
+				}else {
+					writer.append("0");
+					writer.append("\n");
+				}
+			}
+			
+			writer.flush();  
+			writer.close(); 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

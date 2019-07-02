@@ -3,12 +3,13 @@ package genetico;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 
 public class AlgoritmoGenetico {
 	// PARAMETROS A DEFINIR, NUMERO DE GERACOES E TAMANHO DA POPULACAO
-	private final int NUMEROGERACOES = 100, TAMPOPULACAO = 50; 
+	private final int NUMEROGERACOES = 10, TAMPOPULACAO = 5000, NUMEROFILHOS = 2; 
 	
 	//LISTA AUXILIAR QUE CONTEM AS REPRODUÇÕES
 	List<Mochila> bestMochilas = new ArrayList<Mochila>();
@@ -21,7 +22,9 @@ public class AlgoritmoGenetico {
 	
 	public AlgoritmoGenetico(List<Item> itens){
 		this.itens = itens;
-		
+	}
+	
+	public List<Item> gerarSolucao() {
 		//GERA A POPULAÇÃO INICIAL, ATE OBTER DOIS CROMOSSOMOS
 		while(true) {
 			iniciaPopulacao();
@@ -41,99 +44,168 @@ public class AlgoritmoGenetico {
 			System.out.println("=============================================================================================");
 			System.out.println("Geração: "+(i+1)+" Populacao: "+this.mochilas.size());
 			
-//			this.mochilas.forEach(x->System.out.println("v "+x.getValor()+" p "+x.getPeso()));
+//					this.mochilas.forEach(x->System.out.println("v "+x.getValor()+" p "+x.getPeso()));
 			
-			if(bestMochilas.size()>0) {
+			if(mochilas.size()>0) {
 				System.out.print("Itens : [");
-				bestMochilas.get(0).getItens().forEach(x->System.out.print(x.getIdItem()+","));
+				mochilas.get(0).getItens().forEach(x->System.out.print(x.isSelecionado()?x.getIdItem()+" ":""));
 				System.out.println("]");
-				System.out.println("Num Itens: "+this.mochilas.get(0).getItens().size()+" Valor: "+this.mochilas.get(0).getValor()+" Peso: "+this.mochilas.get(0).getPeso());	
+				System.out.println(" Valor: "+this.mochilas.get(0).getValor()+" Peso: "+this.mochilas.get(0).getPeso());	
 			}
 		}
+		return mochilas.get(0).getItens();
 	}
 	
-	/* FUNÇÃO RESPONSAVEL POR FAZER O CROSSOVER , FORAM USADOS DOIS CROSSOVER */
+	/* FUNÇÃO RESPONSAVEL POR FAZER O CROSSOVER */
 	private void crossover() {
-		int maiorSize,menorSize;
-		
-		Mochila mochilaA = new Mochila();
-		Mochila mochilaB = new Mochila();
-		
-		List<Item> itensPaiA = bestMochilas.get(0).getItens();
-		List<Item> itensPaiB = bestMochilas.get(1).getItens();
-		
-		if(itensPaiA.size() > itensPaiB.size()) {
-			maiorSize = itensPaiA.size();
-			menorSize = itensPaiB.size();
-		}else {
-			maiorSize = itensPaiB.size();
-			menorSize = itensPaiA.size();
-		}
-		
-		/* CROSSOVER 1
-		 * CADA FILHO RECEBERA UM GENE DE CADA PAI A CADA ITERACAO 
-		 * */
-		for(int i=0;i<maiorSize;i++) {
-			boolean paiA = i<itensPaiA.size(), paiB= i<itensPaiB.size();
-			
-			if(i%2==0) {
-				mochilaA.getItens().add(paiA ? itensPaiA.get(i) : itensPaiB.get(i));
-				atualizaValores(mochilaA, paiA ? itensPaiA.get(i) : itensPaiB.get(i), 0);
-				
-				mochilaB.getItens().add(paiB ? itensPaiB.get(i) : itensPaiA.get(i));
-				atualizaValores(mochilaB, paiB ? itensPaiB.get(i) : itensPaiA.get(i), 0);
-			}else {
-				mochilaA.getItens().add(paiB ? itensPaiB.get(i) : itensPaiA.get(i));
-				atualizaValores(mochilaA, paiB ? itensPaiB.get(i) : itensPaiA.get(i), 0);
-				
-				mochilaB.getItens().add(paiA ? itensPaiA.get(i) : itensPaiB.get(i));
-				atualizaValores(mochilaB, paiA ? itensPaiA.get(i) : itensPaiB.get(i), 0);
-			}
-		}
+//		int maiorSize,menorSize;
+//		
+//		Mochila mochilaA = new Mochila();
+//		Mochila mochilaB = new Mochila();
+//		
+//		List<Item> itensPaiA = bestMochilas.get(0).getItens();
+//		List<Item> itensPaiB = bestMochilas.get(1).getItens();
+//		
+//		if(itensPaiA.size() > itensPaiB.size()) {
+//			maiorSize = itensPaiA.size();
+//			menorSize = itensPaiB.size();
+//		}else {
+//			maiorSize = itensPaiB.size();
+//			menorSize = itensPaiA.size();
+//		}
+//		
+//		/* CROSSOVER 1
+//		 * CADA FILHO RECEBERA UM GENE DE CADA PAI A CADA ITERACAO 
+//		 * */
+//		for(int i=0;i<maiorSize;i++) {
+//			boolean paiA = i<itensPaiA.size(), paiB= i<itensPaiB.size();
+//			
+//			if(i%2==0) {
+//				mochilaA.getItens().add(paiA ? itensPaiA.get(i) : itensPaiB.get(i));
+//				atualizaValores(mochilaA, paiA ? itensPaiA.get(i) : itensPaiB.get(i), 0);
+//				
+//				mochilaB.getItens().add(paiB ? itensPaiB.get(i) : itensPaiA.get(i));
+//				atualizaValores(mochilaB, paiB ? itensPaiB.get(i) : itensPaiA.get(i), 0);
+//			}else {
+//				mochilaA.getItens().add(paiB ? itensPaiB.get(i) : itensPaiA.get(i));
+//				atualizaValores(mochilaA, paiB ? itensPaiB.get(i) : itensPaiA.get(i), 0);
+//				
+//				mochilaB.getItens().add(paiA ? itensPaiA.get(i) : itensPaiB.get(i));
+//				atualizaValores(mochilaB, paiA ? itensPaiA.get(i) : itensPaiB.get(i), 0);
+//			}
+//		}
 		
 		//INICIALIZA LISTA DE FILHOS E ADICIONA 2 FILHOS, REPRODUZIDOS A PARTIR DO PRIMEIRO METODO DE CROSSOVER
-		this.bestMochilas = new ArrayList<Mochila>();
-		this.bestMochilas.add(mochilaA);
-		this.bestMochilas.add(mochilaB);
+//		this.bestMochilas = new ArrayList<Mochila>();
+//		this.bestMochilas.add(mochilaA);
+//		this.bestMochilas.add(mochilaB);
 		
-		Random rand = new Random(System.currentTimeMillis());
+//		Random rand = new Random(System.currentTimeMillis());
+//
+//		List<Integer> conjuntoPtsAleatorios = new ArrayList<Integer>();
+//		
+//		//ADICIONA NA LISTA OS POSSIVEIS PONTOS DE CORTE
+//		for(int x=0; x < menorSize;x++) {
+//			conjuntoPtsAleatorios.add(x);
+//		}
+//		
+//		for(int i = 0 ; i < menorSize ; i++) {
+//			Mochila m = new Mochila();
+//			
+//			//RAND EM UM PONTO DE CORTE, A PARTIR DA LISTA DE PONTOS DE CORTE
+//			int indice = rand.nextInt(conjuntoPtsAleatorios.size());
+//			int pontoCorte = conjuntoPtsAleatorios.get(indice);
+//			
+//			//REMOVE O PONTO DE CORTE DA LISTA DE POSSIVEIS
+//			conjuntoPtsAleatorios.remove(pontoCorte);
+//			
+//		/* CROSSOVER 2
+//		* UM FILHO RECEBERA OS GENES DO PAI A, ATE O PONTO DE CORTE 
+//		* E OS GENES DO PAI B A PARTIR DO PONTO DE CORTE 
+//		* */
+//			for(int j = 0; j < pontoCorte ; j++) {
+//				Item item = 
+//					new Item(itensPaiA.get(j).getValor(), itensPaiA.get(j).getPeso(), itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
+//				m.getItens().add(item);
+//				if(item.isSelecionado()) {
+//					atualizaValores(m, item, 0);
+//				}
+//			}
+//			
+//			int k;
+//			for(k = pontoCorte; k < itensPaiB.size() ; k++) {
+//				Item item =
+//					new Item(itensPaiB.get(k).getValor(), itensPaiB.get(k).getPeso(), itensPaiB.get(k).getIdItem(),itensPaiB.get(k).isSelecionado());
+//				m.getItens().add(item);
+//				if(item.isSelecionado()) {
+//					atualizaValores(m, item, 0);
+//				}
+//			}
+//			
+//			this.bestMochilas.add(m);
+//		}
+		
+		List<Item> itensPaiA = new ArrayList<>(mochilas.get(0).getItens());
+		List<Item> itensPaiB = new ArrayList<>(mochilas.get(1).getItens());
 
-		List<Integer> conjuntoPtsAleatorios = new ArrayList<Integer>();
+		Random rand = new Random(System.currentTimeMillis());
 		
-		//ADICIONA NA LISTA OS POSSIVEIS PONTOS DE CORTE
-		for(int x=0; x < menorSize;x++) {
-			conjuntoPtsAleatorios.add(x);
-		}
-		
-		for(int i = 0 ; i < menorSize ; i++) {
-			Mochila m = new Mochila();
+		for(int i=0;i<NUMEROFILHOS/2;i++) {
+			int size = itensPaiA.size();
+			int[] doisPtsCorte = {rand.nextInt(size),rand.nextInt(size)};
 			
-			//RAND EM UM PONTO DE CORTE, A PARTIR DA LISTA DE PONTOS DE CORTE
-			int pontoCorte = rand.nextInt(conjuntoPtsAleatorios.size());
+			int maiorSize, menorSize;
 			
-			//REMOVE O PONTO DE CORTE DA LISTA DE POSSIVEIS
-			conjuntoPtsAleatorios.remove(pontoCorte);
-			
-			/* CROSSOVER 2
-			 * UM FILHO RECEBERA OS GENES DO PAI A, ATE O PONTO DE CORTE 
-			 * E OS GENES DO PAI B A PARTIR DO PONTO DE CORTE 
-			 * */
-			for(int j = 0; j < pontoCorte ; j++) {
-				m.getItens().add(itensPaiA.get(j));
-				atualizaValores(m, itensPaiA.get(j), 0);
+			if(doisPtsCorte[0] > doisPtsCorte[1]) {
+				maiorSize = doisPtsCorte[0];
+				menorSize = doisPtsCorte[1];
+			}else {
+				maiorSize = doisPtsCorte[1];
+				menorSize = doisPtsCorte[0];
 			}
 			
-			int k;
-			for(k = pontoCorte; k < itensPaiB.size() ; k++) {
-				m.getItens().add(itensPaiB.get(k));
-				atualizaValores(m, itensPaiB.get(k), 0);
+			Mochila fA = new Mochila();
+			Mochila fB = new Mochila();
+			
+			for(int j = 0; j<menorSize; j++) {
+				Item itemA = new Item(itensPaiA.get(j).getPeso(),itensPaiA.get(j).getValor(),itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
+				fA.getItens().add(itemA);
+				atualizaValores(fA, itemA, 0);
+				
+				Item itemB = new Item(itensPaiB.get(j).getPeso(),itensPaiB.get(j).getValor(),itensPaiB.get(j).getIdItem(),itensPaiB.get(j).isSelecionado());
+				fB.getItens().add(itemB);
+				atualizaValores(fB, itemB, 0);
 			}
 			
-			this.bestMochilas.add(m);
+			if(menorSize==0) {
+				menorSize++;
+			}
+			
+			for(int j=menorSize-1;j<maiorSize-1;j++) {
+				Item itemB = new Item(itensPaiB.get(j).getPeso(),itensPaiB.get(j).getValor(),itensPaiB.get(j).getIdItem(),itensPaiB.get(j).isSelecionado());
+				fA.getItens().add(itemB);
+				atualizaValores(fA, itemB, 0);
+				
+				Item itemA = new Item(itensPaiA.get(j).getPeso(),itensPaiA.get(j).getValor(),itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
+				fB.getItens().add(itemA);
+				atualizaValores(fB, itemA, 0);
+			}
+			
+			for(int j=maiorSize-1;j<size-1;j++) {
+				Item itemA = new Item(itensPaiA.get(j).getPeso(),itensPaiA.get(j).getValor(),itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
+				fA.getItens().add(itemA);
+				atualizaValores(fA, itemA, 0);
+				
+				Item itemB = new Item(itensPaiB.get(j).getPeso(),itensPaiB.get(j).getValor(),itensPaiB.get(j).getIdItem(),itensPaiB.get(j).isSelecionado());
+				fB.getItens().add(itemB);
+				atualizaValores(fB, itemB, 0);
+			}
+			this.bestMochilas.add(fA);
+			this.bestMochilas.add(fB);
 		}
 	}
 	
-	/* FAZ A MUTACAO DO GENE SORTEADO */
+	/* FAZ A MUTACAO POR INDIVIDUO */
 	private void mutacao() {
 		Random rand = new Random(System.currentTimeMillis());
 		
@@ -143,12 +215,14 @@ public class AlgoritmoGenetico {
 			
 			//MUTAÇÃO: TEM = REMOVE, NÃO TEM = ADICIONA
 			for(Mochila m: bestMochilas) {
-				if(m.getItens().contains(itemEscolhido)) {
-					atualizaValores(m, itemEscolhido, 1);
-					m.getItens().remove(itemEscolhido);
+				Optional<Item> item = m.getItens().stream().filter(x->itemEscolhido.getIdItem().equals(x.getIdItem())).findFirst();
+				int indice = m.getItens().indexOf(item.get());
+				if(m.getItens().get(indice).isSelecionado()) {
+					atualizaValores(m, item.get(), 1);
+					m.getItens().get(indice).setSelecionado(false);
 				}else {
-					atualizaValores(m, itemEscolhido, 0);
-					m.getItens().add(itemEscolhido);
+					atualizaValores(m, item.get(), 0);
+					m.getItens().get(indice).setSelecionado(true);
 				}
 			}
 		}
@@ -167,6 +241,9 @@ public class AlgoritmoGenetico {
 		this.bestMochilas.add(mochilas.get(0));
 		this.bestMochilas.add(mochilas.get(1));
 		this.mochilas = new ArrayList<Mochila>(this.bestMochilas); 
+		
+		//zera lista besMochilas
+		this.bestMochilas = new ArrayList<Mochila>();
 	}
 	
 	/* FAZ A AVALIAÇÃO DA POPULAÇÃO, E SE NECESSARIO SEU CORTE*/
@@ -192,9 +269,11 @@ public class AlgoritmoGenetico {
 			//GERA CROMOSSOMO, MOCHILA
 			Mochila mochila = new Mochila();
 			for(int j=0;j<itens.size();j++) {
+				Item item = new Item(itens.get(j).getValor(),itens.get(j).getPeso(), itens.get(j).getIdItem(), itens.get(j).isSelecionado());
+				mochila.getItens().add(item);
 				if(rand.nextInt(2) == 1) {
-					mochila.getItens().add(itens.get(j));
-					atualizaValores(mochila, itens.get(j), 0);
+					item.setSelecionado(true);
+					atualizaValores(mochila, item, 0);
 				}
 			}
 			this.mochilas.add(mochila);

@@ -5,11 +5,13 @@ public class Item {
 	private double valor;
 	private double peso;
 	private String idItem;
+	private boolean selecionado;
 	
-	public Item(double valor, double peso, String idItem) {
+	public Item(double valor, double peso, String idItem, boolean selecionado) {
 		this.valor = valor;
 		this.peso = peso;
 		this.idItem = idItem;
+		this.selecionado = selecionado;
 	}
 	
 	public double getValor() {
@@ -34,6 +36,14 @@ public class Item {
 
 	public void setIdItem(String idItem) {
 		this.idItem = idItem;
+	}
+
+	public boolean isSelecionado() {
+		return selecionado;
+	}
+
+	public void setSelecionado(boolean selecionado) {
+		this.selecionado = selecionado;
 	}
 
 }
