@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class AlgoritmoGenetico {
 	// PARAMETROS A DEFINIR, NUMERO DE GERACOES E TAMANHO DA POPULACAO
-	private final int NUMEROGERACOES = 10, TAMPOPULACAO = 5000, NUMEROFILHOS = 2; 
+	private final int NUMEROGERACOES = 50, TAMPOPULACAO = 100, NUMEROFILHOS = 20; 
 	
 	//LISTA AUXILIAR QUE CONTEM AS REPRODUÇÕES
 	List<Mochila> bestMochilas = new ArrayList<Mochila>();
@@ -58,13 +58,13 @@ public class AlgoritmoGenetico {
 	
 	/* FUNÇÃO RESPONSAVEL POR FAZER O CROSSOVER */
 	private void crossover() {
-//		int maiorSize,menorSize;
+//		int maiorSize,menorSize; 
 //		
 //		Mochila mochilaA = new Mochila();
 //		Mochila mochilaB = new Mochila();
-//		
-//		List<Item> itensPaiA = bestMochilas.get(0).getItens();
-//		List<Item> itensPaiB = bestMochilas.get(1).getItens();
+		
+//		List<Item> itensPaiA = new ArrayList<Item>(mochilas.get(0).getItens());
+//		List<Item> itensPaiB = new ArrayList<Item>(mochilas.get(1).getItens());
 //		
 //		if(itensPaiA.size() > itensPaiB.size()) {
 //			maiorSize = itensPaiA.size();
@@ -103,8 +103,8 @@ public class AlgoritmoGenetico {
 //		Random rand = new Random(System.currentTimeMillis());
 //
 //		List<Integer> conjuntoPtsAleatorios = new ArrayList<Integer>();
-//		
-//		//ADICIONA NA LISTA OS POSSIVEIS PONTOS DE CORTE
+		
+		//ADICIONA NA LISTA OS POSSIVEIS PONTOS DE CORTE
 //		for(int x=0; x < menorSize;x++) {
 //			conjuntoPtsAleatorios.add(x);
 //		}
@@ -113,8 +113,8 @@ public class AlgoritmoGenetico {
 //			Mochila m = new Mochila();
 //			
 //			//RAND EM UM PONTO DE CORTE, A PARTIR DA LISTA DE PONTOS DE CORTE
-//			int indice = rand.nextInt(conjuntoPtsAleatorios.size());
-//			int pontoCorte = conjuntoPtsAleatorios.get(indice);
+//			int pontoCorte = rand.nextInt(conjuntoPtsAleatorios.size());
+////			int pontoCorte = conjuntoPtsAleatorios.get(indice);
 //			
 //			//REMOVE O PONTO DE CORTE DA LISTA DE POSSIVEIS
 //			conjuntoPtsAleatorios.remove(pontoCorte);
@@ -152,17 +152,20 @@ public class AlgoritmoGenetico {
 		
 		for(int i=0;i<NUMEROFILHOS/2;i++) {
 			int size = itensPaiA.size();
-			int[] doisPtsCorte = {rand.nextInt(size),rand.nextInt(size)};
+			int maiorSize = 0, menorSize = 0;
 			
-			int maiorSize, menorSize;
-			
-			if(doisPtsCorte[0] > doisPtsCorte[1]) {
-				maiorSize = doisPtsCorte[0];
-				menorSize = doisPtsCorte[1];
-			}else {
-				maiorSize = doisPtsCorte[1];
-				menorSize = doisPtsCorte[0];
+			while(maiorSize == 0){
+				int[] doisPtsCorte = {rand.nextInt(size),rand.nextInt(size)};
+				
+				if(doisPtsCorte[0] > doisPtsCorte[1]) {
+					maiorSize = doisPtsCorte[0];
+					menorSize = doisPtsCorte[1];
+				}else {
+					maiorSize = doisPtsCorte[1];
+					menorSize = doisPtsCorte[0];
+				}
 			}
+			
 			
 			Mochila fA = new Mochila();
 			Mochila fB = new Mochila();
@@ -170,35 +173,33 @@ public class AlgoritmoGenetico {
 			for(int j = 0; j<menorSize; j++) {
 				Item itemA = new Item(itensPaiA.get(j).getPeso(),itensPaiA.get(j).getValor(),itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
 				fA.getItens().add(itemA);
-				atualizaValores(fA, itemA, 0);
+				if(itemA.isSelecionado()) atualizaValores(fA, itemA, 0);
 				
 				Item itemB = new Item(itensPaiB.get(j).getPeso(),itensPaiB.get(j).getValor(),itensPaiB.get(j).getIdItem(),itensPaiB.get(j).isSelecionado());
 				fB.getItens().add(itemB);
-				atualizaValores(fB, itemB, 0);
+				if(itemB.isSelecionado()) atualizaValores(fB, itemB, 0);
 			}
 			
-			if(menorSize==0) {
-				menorSize++;
-			}
+			if(menorSize==0) menorSize++;
 			
 			for(int j=menorSize-1;j<maiorSize-1;j++) {
 				Item itemB = new Item(itensPaiB.get(j).getPeso(),itensPaiB.get(j).getValor(),itensPaiB.get(j).getIdItem(),itensPaiB.get(j).isSelecionado());
 				fA.getItens().add(itemB);
-				atualizaValores(fA, itemB, 0);
+				if(itemB.isSelecionado()) atualizaValores(fA, itemB, 0);
 				
 				Item itemA = new Item(itensPaiA.get(j).getPeso(),itensPaiA.get(j).getValor(),itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
 				fB.getItens().add(itemA);
-				atualizaValores(fB, itemA, 0);
+				if(itemA.isSelecionado()) atualizaValores(fB, itemA, 0);
 			}
 			
 			for(int j=maiorSize-1;j<size-1;j++) {
 				Item itemA = new Item(itensPaiA.get(j).getPeso(),itensPaiA.get(j).getValor(),itensPaiA.get(j).getIdItem(),itensPaiA.get(j).isSelecionado());
 				fA.getItens().add(itemA);
-				atualizaValores(fA, itemA, 0);
+				if(itemA.isSelecionado()) atualizaValores(fA, itemA, 0);
 				
 				Item itemB = new Item(itensPaiB.get(j).getPeso(),itensPaiB.get(j).getValor(),itensPaiB.get(j).getIdItem(),itensPaiB.get(j).isSelecionado());
 				fB.getItens().add(itemB);
-				atualizaValores(fB, itemB, 0);
+				if(itemB.isSelecionado()) atualizaValores(fB, itemB, 0);
 			}
 			this.bestMochilas.add(fA);
 			this.bestMochilas.add(fB);
@@ -216,13 +217,15 @@ public class AlgoritmoGenetico {
 			//MUTAÇÃO: TEM = REMOVE, NÃO TEM = ADICIONA
 			for(Mochila m: bestMochilas) {
 				Optional<Item> item = m.getItens().stream().filter(x->itemEscolhido.getIdItem().equals(x.getIdItem())).findFirst();
-				int indice = m.getItens().indexOf(item.get());
-				if(m.getItens().get(indice).isSelecionado()) {
-					atualizaValores(m, item.get(), 1);
-					m.getItens().get(indice).setSelecionado(false);
-				}else {
-					atualizaValores(m, item.get(), 0);
-					m.getItens().get(indice).setSelecionado(true);
+				if(item.isPresent()) {
+					int indice = m.getItens().indexOf(item.get());
+					if(m.getItens().get(indice).isSelecionado()) {
+						atualizaValores(m, item.get(), 1);
+						m.getItens().get(indice).setSelecionado(false);
+					}else {
+						atualizaValores(m, item.get(), 0);
+						m.getItens().get(indice).setSelecionado(true);
+					}
 				}
 			}
 		}
@@ -239,7 +242,14 @@ public class AlgoritmoGenetico {
 
 		//MANTEM SÓ OS DOIS MELHORES CROMOSSOMOS, QUE SERÃO PAIS NA PROXIMA GERAÇÃO
 		this.bestMochilas.add(mochilas.get(0));
-		this.bestMochilas.add(mochilas.get(1));
+		
+		for(Mochila m : this.mochilas) {
+			if(m.getPeso() != this.bestMochilas.get(0).getPeso() || m.getValor() != this.bestMochilas.get(0).getValor()) {
+				this.bestMochilas.add(m);
+				break;
+			}
+		}
+		
 		this.mochilas = new ArrayList<Mochila>(this.bestMochilas); 
 		
 		//zera lista besMochilas
@@ -272,8 +282,10 @@ public class AlgoritmoGenetico {
 				Item item = new Item(itens.get(j).getValor(),itens.get(j).getPeso(), itens.get(j).getIdItem(), itens.get(j).isSelecionado());
 				mochila.getItens().add(item);
 				if(rand.nextInt(2) == 1) {
-					item.setSelecionado(true);
-					atualizaValores(mochila, item, 0);
+					if(mochila.getPeso() + item.getPeso() <= mochila.getCapacidadeTotal()) {
+						item.setSelecionado(true);
+						atualizaValores(mochila, item, 0);
+					}
 				}
 			}
 			this.mochilas.add(mochila);

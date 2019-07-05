@@ -16,7 +16,7 @@ public class MochilaMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Path caminho = Paths.get(System.getProperty("user.home"),"Downloads/item_50.csv");
+		Path caminho = Paths.get(System.getProperty("user.home"),"Downloads/teste.csv");
 		Supplier<Stream<String>> lines = () -> {
 			try {
 				return Files.lines(caminho);
